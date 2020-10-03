@@ -24,8 +24,16 @@ def checkDataInCache(sql):
     else:
         print('getting data from postgres')
         res=session.execute(sql).fetchall()
-        client.setex(sql,100,json.dumps(res))
+        data = ({'result': [dict(row) for row in res]})
+        client.setex(sql,100,json.dumps(data))
         print(res)
+
+def datafromrds(sql):
+    '''Get data from redis or postgres'''
+    print('getting data from postgres')
+    res=session.execute(sql).fetchall()
+    data=({'result': [dict(row) for row in res]})
+    print(json.dumps(data))
 
 if __name__=="__main__":
     sql="""select id,marks,subject,
@@ -37,4 +45,4 @@ if __name__=="__main__":
             end as grade
             from marks"""
     print(sql)
-    checkDataInCache(sql)
+    datafromrds(sql)
