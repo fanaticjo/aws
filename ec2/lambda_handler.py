@@ -5,7 +5,7 @@ import os
 
 ec2 = boto3.client('ec2')
 sns=boto3.client('sns')
-snsarn='arn:aws:sns:us-east-1:944556464382:ec2'
+snsarn=os.environ['sns']
 
 def describeState(id) -> List[dict]:
     ec2_exec = ec2.describe_instances(
