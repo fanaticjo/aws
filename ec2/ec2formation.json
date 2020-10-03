@@ -1,0 +1,101 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Creates an ec2 and sg",
+  "Parameters": {
+    "IntanceType": {
+      "Description": "Type of ec2",
+      "Type": "String",
+      "Default": "t2.micro",
+      "AllowedValues": [
+                "t1.micro",
+                "m1.small",
+                "m1.medium",
+                "m1.large",
+                "m1.xlarge",
+                "m2.xlarge",
+                "m2.2xlarge",
+                "m2.4xlarge",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c1.medium",
+                "c1.xlarge",
+                "cc1.4xlarge",
+                "cc2.8xlarge",
+                "cg1.4xlarge",
+                "t2.micro"
+            ]
+    },
+    "KeyName": {
+      "Description": "Name of an exiting key pair",
+      "Type": "String",
+      "Default": "demo-aws-session"
+    },
+    "ami": {
+      "Type": "String",
+      "Description": "Name of the ami id",
+      "Default": "ami-0947d2ba12ee1ff75"
+    },
+    "role": {
+      "Type": "String",
+      "Description": "Name of the ami id",
+      "Default": "s3ssmec2"
+    },
+    "Subnet": {
+      "Type": "String",
+      "Default": "subnet-05b7d448"
+    },
+    "Vpc":{
+      "Type": "String",
+      "Default": "vpc-abbe51d6"
+    }
+  },
+  "Resources": {
+     "InstanceSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "Vpc"
+                },
+                "GroupDescription": "Enable SSH access via port 22",
+                "SecurityGroupIngress": [
+                    {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
+                    {"IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0"},
+                    {"IpProtocol" : "icmp", "FromPort" : "8", "ToPort" : "-1", "CidrIp" : "0.0.0.0/0" },
+                    {"IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : "0.0.0.0/0"}
+                ]
+            }
+        },
+    "ServerInstance": {
+      "Type" : "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId":{
+          "Ref": "ami"
+        },
+        "InstanceType": {
+          "Ref": "IntanceType"
+        },
+        "IamInstanceProfile": {
+          "Ref" : "role"
+        },
+        "SecurityGroupIds":[ {
+          "Ref": "InstanceSecurityGroup"
+        }],
+        "SubnetId": {
+          "Ref":"Subnet"
+        }
+      },
+      "DependsOn" : "InstanceSecurityGroup"
+    }
+  },
+  "Outputs": {
+    "Url": {
+      "Value": {
+        "Fn::Join": ["",[
+          "http://",{
+            "Fn::GetAtt": ["ServerInstance","PublicIp"]
+          }
+        ]]
+      }
+    }
+  }
+}
