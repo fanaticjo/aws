@@ -1,3 +1,9 @@
 1) install python3
 2) install requirments.txt
 3) make the egg file
+4) pip install aws-psycopg2 ,sqlalchemy ,redis , boto3
+5) create 2 secrets manager dev/rds , dev/redis and store the credentails there
+6) upload the egg file and the run to s3 and bring it to ec2
+7) run the run.py file
+8) run it again
+
